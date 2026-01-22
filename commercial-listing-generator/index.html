@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercial Listing Generator | Schreder Brothers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f5f5f5;
+            color: #070707;
+            line-height: 1.45em;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left Panel - Controls */
+        .controls-panel {
+            width: 400px;
+            background: white;
+            padding: 24px;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+            max-height: 100vh;
+        }
+
+        .controls-panel h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: #8F060B;
+            margin-bottom: 8px;
+        }
+
+        .controls-panel .subtitle {
+            color: #4D4D4D;
+            font-size: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #8F060B;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4D4D4D;
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #070707;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Lato', sans-serif;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #8F060B;
+        }
+
+        /* Photo Upload Area */
+        .photo-upload {
+            border: 2px dashed #8F060B;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #faf7f7;
+            margin-bottom: 12px;
+        }
+
+        .photo-upload:hover {
+            background: #f5efef;
+            border-color: #6a0509;
+        }
+
+        .photo-upload.has-image {
+            padding: 8px;
+            border-style: solid;
+        }
+
+        .photo-upload img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+        }
+
+        .photo-upload-text {
+            color: #8F060B;
+            font-weight: 700;
+        }
+
+        .photo-upload-subtext {
+            color: #4D4D4D;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Image Position Controls */
+        .position-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .position-controls label {
+            margin-bottom: 4px;
+        }
+
+        .position-controls input {
+            margin-bottom: 0;
+        }
+
+        .zoom-control {
+            margin-bottom: 12px;
+        }
+
+        .zoom-control input[type="range"] {
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        /* Feature Toggles */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .feature-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .feature-toggle:hover {
+            background: #f0f0f0;
+        }
+
+        .feature-toggle input {
+            accent-color: #8F060B;
+            width: 16px;
+            height: 16px;
+        }
+
+        .feature-toggle span {
+            font-size: 13px;
+        }
+
+        /* Feature Inputs */
+        .feature-inputs {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .feature-input-row {
+            display: none;
+        }
+
+        .feature-input-row.active {
+            display: block;
+        }
+
+        /* Download Button */
+        .download-btn {
+            width: 100%;
+            padding: 14px;
+            background: #8F060B;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .download-btn:hover {
+            background: #6a0509;
+        }
+
+        /* Right Panel - Preview */
+        .preview-panel {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #e8e8e8;
+        }
+
+        .preview-label {
+            font-weight: 700;
+            color: #4D4D4D;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+
+        /* Canvas Preview */
+        #preview-container {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #preview-canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Hidden file input */
+        #photo-input {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .controls-panel {
+                width: 100%;
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            .preview-panel {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <h1>Commercial Listing Generator</h1>
+            <p class="subtitle">Schreder Brothers Real Estate Group</p>
+
+            <!-- Headline Section -->
+            <div class="section">
+                <div class="section-title">Headline</div>
+                <label for="headline">Main Headline</label>
+                <input type="text" id="headline" value="Prime Commercial Opportunity | Now Available for Lease" placeholder="Enter headline...">
+            </div>
+
+            <!-- Photo Section -->
+            <div class="section">
+                <div class="section-title">Property Photo</div>
+                <div class="photo-upload" id="photo-upload">
+                    <div class="photo-upload-text">Drop photo here or click to upload</div>
+                    <div class="photo-upload-subtext">PNG, JPG up to 10MB</div>
+                </div>
+                <input type="file" id="photo-input" accept="image/*">
+                
+                <div class="position-controls">
+                    <div>
+                        <label for="pos-x">Horizontal Position</label>
+                        <input type="range" id="pos-x" min="0" max="100" value="50">
+                    </div>
+                    <div>
+                        <label for="pos-y">Vertical Position</label>
+                        <input type="range" id="pos-y" min="0" max="100" value="50">
+                    </div>
+                </div>
+                <div class="zoom-control">
+                    <label for="zoom">Zoom Level</label>
+                    <input type="range" id="zoom" min="100" max="300" value="100">
+                </div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="section">
+                <div class="section-title">Property Address</div>
+                <label for="address">Address</label>
+                <input type="text" id="address" value="" placeholder="123 Industrial Way, Langley, BC">
+            </div>
+
+            <!-- Features Section -->
+            <div class="section">
+                <div class="section-title">Select Features to Display</div>
+                <div class="features-grid">
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-zoning" checked>
+                        <span>Zoning</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-ocp">
+                        <span>OCP Designation</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-lot-size" checked>
+                        <span>Lot Size</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-building-size" checked>
+                        <span>Building Size</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-unit-size">
+                        <span>Unit Size</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-site-coverage">
+                        <span>Site Coverage</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-parking" checked>
+                        <span>Parking Allocation</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-loading">
+                        <span>Loading Doors</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-ceiling">
+                        <span>Ceiling Height</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-power">
+                        <span>Power Supply</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-floor-load">
+                        <span>Floor Load Capacity</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-construction">
+                        <span>Construction Type</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-traffic">
+                        <span>Traffic Count</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-basic-rent">
+                        <span>Basic Rent</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-additional-rent">
+                        <span>Additional Rent</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-gross-rent">
+                        <span>Gross Rent</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-asking-price">
+                        <span>Asking Price</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-year-built">
+                        <span>Year Built</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-date-available">
+                        <span>Date Available</span>
+                    </label>
+                    <label class="feature-toggle">
+                        <input type="checkbox" id="toggle-est-completion">
+                        <span>Estimated Completion</span>
+                    </label>
+                </div>
+
+                <div class="feature-inputs">
+                    <div class="feature-input-row active" id="input-zoning">
+                        <label for="zoning-value">Zoning</label>
+                        <input type="text" id="zoning-value" value="M-1" placeholder="e.g., M-1, C-2, I-1">
+                    </div>
+                    <div class="feature-input-row" id="input-ocp">
+                        <label for="ocp-value">OCP Designation</label>
+                        <input type="text" id="ocp-value" value="Industrial" placeholder="e.g., Industrial, Commercial">
+                    </div>
+                    <div class="feature-input-row active" id="input-lot-size">
+                        <label for="lot-size-value">Lot Size</label>
+                        <input type="text" id="lot-size-value" value="0.85 Acres" placeholder="e.g., 0.85 Acres">
+                    </div>
+                    <div class="feature-input-row active" id="input-building-size">
+                        <label for="building-size-value">Building Size</label>
+                        <input type="text" id="building-size-value" value="12,500 SF" placeholder="e.g., 12,500 SF">
+                    </div>
+                    <div class="feature-input-row" id="input-unit-size">
+                        <label for="unit-size-value">Unit Size</label>
+                        <input type="text" id="unit-size-value" value="2,500 SF" placeholder="e.g., 2,500 SF">
+                    </div>
+                    <div class="feature-input-row" id="input-site-coverage">
+                        <label for="site-coverage-value">Site Coverage</label>
+                        <input type="text" id="site-coverage-value" value="45%" placeholder="e.g., 45%">
+                    </div>
+                    <div class="feature-input-row active" id="input-parking">
+                        <label for="parking-value">Parking Allocation</label>
+                        <input type="text" id="parking-value" value="35 Stalls" placeholder="e.g., 35 Stalls">
+                    </div>
+                    <div class="feature-input-row" id="input-loading">
+                        <label for="loading-value">Loading Doors</label>
+                        <input type="text" id="loading-value" value="2 Grade-Level" placeholder="e.g., 2 Grade-Level">
+                    </div>
+                    <div class="feature-input-row" id="input-ceiling">
+                        <label for="ceiling-value">Ceiling Height</label>
+                        <input type="text" id="ceiling-value" value="24' Clear" placeholder="e.g., 24' Clear">
+                    </div>
+                    <div class="feature-input-row" id="input-power">
+                        <label for="power-value">Power Supply</label>
+                        <input type="text" id="power-value" value="600V / 400A" placeholder="e.g., 600V / 400A">
+                    </div>
+                    <div class="feature-input-row" id="input-floor-load">
+                        <label for="floor-load-value">Floor Load Capacity</label>
+                        <input type="text" id="floor-load-value" value="500 PSF" placeholder="e.g., 500 PSF">
+                    </div>
+                    <div class="feature-input-row" id="input-construction">
+                        <label for="construction-value">Construction Type</label>
+                        <input type="text" id="construction-value" value="Concrete Tilt-Up" placeholder="e.g., Concrete Tilt-Up">
+                    </div>
+                    <div class="feature-input-row" id="input-traffic">
+                        <label for="traffic-value">Traffic Count</label>
+                        <input type="text" id="traffic-value" value="25,000 VPD" placeholder="e.g., 25,000 VPD">
+                    </div>
+                    <div class="feature-input-row" id="input-basic-rent">
+                        <label for="basic-rent-value">Basic Rent</label>
+                        <input type="text" id="basic-rent-value" value="$18.50/SF" placeholder="e.g., $18.50/SF">
+                    </div>
+                    <div class="feature-input-row" id="input-additional-rent">
+                        <label for="additional-rent-value">Additional Rent</label>
+                        <input type="text" id="additional-rent-value" value="$8.50/SF" placeholder="e.g., $8.50/SF">
+                    </div>
+                    <div class="feature-input-row" id="input-gross-rent">
+                        <label for="gross-rent-value">Gross Rent</label>
+                        <input type="text" id="gross-rent-value" value="$27.00/SF" placeholder="e.g., $27.00/SF">
+                    </div>
+                    <div class="feature-input-row" id="input-asking-price">
+                        <label for="asking-price-value">Asking Price</label>
+                        <input type="text" id="asking-price-value" value="$4,500,000" placeholder="e.g., $4,500,000">
+                    </div>
+                    <div class="feature-input-row" id="input-year-built">
+                        <label for="year-built-value">Year Built</label>
+                        <input type="text" id="year-built-value" value="2019" placeholder="e.g., 2019">
+                    </div>
+                    <div class="feature-input-row" id="input-date-available">
+                        <label for="date-available-value">Date Available</label>
+                        <input type="text" id="date-available-value" value="Immediate" placeholder="e.g., Immediate, Q2 2026">
+                    </div>
+                    <div class="feature-input-row" id="input-est-completion">
+                        <label for="est-completion-value">Estimated Completion</label>
+                        <input type="text" id="est-completion-value" value="Q4 2026" placeholder="e.g., Q4 2026">
+                    </div>
+                </div>
+            </div>
+
+            <button class="download-btn" id="download-btn">Download PNG</button>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <div class="preview-label">Preview</div>
+            <div id="preview-container">
+                <canvas id="preview-canvas" width="1080" height="1080"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas and context
+        const canvas = document.getElementById('preview-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Brand colors
+        const MAROON = '#8F060B';
+        const BLACK = '#000000';
+        const DARK_GREY = '#4D4D4D';
+        const LIGHT_TEAL = '#BCA6AA';
+        const DARK_TEAL = '#556F7A';
+        const WHITE = '#FFFFFF';
+
+        // State
+        let uploadedImage = null;
+        let imagePosition = { x: 50, y: 50 };
+        let imageZoom = 100;
+
+        // Function to draw the SB monogram badge (fallback when no logo uploaded)
+        function drawSBBadge(ctx, x, y, size) {
+            // Badge background
+            ctx.fillStyle = MAROON;
+            ctx.beginPath();
+            ctx.roundRect(x, y, size, size, 6);
+            ctx.fill();
+            
+            // SB letters
+            ctx.fillStyle = WHITE;
+            ctx.font = `bold ${size * 0.44}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('SB', x + size/2, y + size/2 + size * 0.16);
+            ctx.textAlign = 'left';
+        }
+
+        // Feature icons as SVG paths (simplified representations)
+        const featureIcons = {
+            zoning: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2.5;
+                // Commercial building
+                ctx.strokeRect(x + 14, y + 12, size - 28, size - 20);
+                ctx.beginPath();
+                ctx.moveTo(x + 10, y + 12);
+                ctx.lineTo(x + size - 10, y + 12);
+                ctx.stroke();
+                const winSize = 6;
+                const winGap = 10;
+                const startX = x + 18;
+                const startY = y + 18;
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 2; col++) {
+                        ctx.fillRect(startX + col * winGap, startY + row * winGap, winSize, winSize);
+                    }
+                }
+                ctx.strokeRect(x + size/2 - 8, y + size - 16, 16, 8);
+            },
+            ocp: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Document with lines
+                ctx.strokeRect(x + 12, y + 8, size - 24, size - 16);
+                ctx.beginPath();
+                ctx.moveTo(x + 18, y + 20);
+                ctx.lineTo(x + size - 18, y + 20);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 18, y + 30);
+                ctx.lineTo(x + size - 18, y + 30);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 18, y + 40);
+                ctx.lineTo(x + size - 26, y + 40);
+                ctx.stroke();
+            },
+            'lot-size': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Land parcel
+                ctx.beginPath();
+                ctx.moveTo(x + 12, y + size - 16);
+                ctx.lineTo(x + 12, y + 20);
+                ctx.lineTo(x + size - 12, y + 12);
+                ctx.lineTo(x + size - 12, y + size - 12);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 12, y + size/2);
+                ctx.lineTo(x + size - 12, y + size/2 - 2);
+                ctx.stroke();
+            },
+            'building-size': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Building with dimension
+                ctx.strokeRect(x + 12, y + 12, size - 24, size - 24);
+                ctx.beginPath();
+                ctx.moveTo(x + 16, y + size - 8);
+                ctx.lineTo(x + size - 16, y + size - 8);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + size - 8, y + 16);
+                ctx.lineTo(x + size - 8, y + size - 16);
+                ctx.stroke();
+            },
+            'unit-size': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Smaller square inside
+                ctx.strokeRect(x + 10, y + 10, size - 20, size - 20);
+                ctx.strokeRect(x + 18, y + 18, size - 36, size - 36);
+            },
+            'site-coverage': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Lot outline
+                ctx.strokeRect(x + 10, y + 10, size - 20, size - 20);
+                // Filled portion
+                ctx.globalAlpha = 0.5;
+                ctx.fillRect(x + 14, y + 14, (size - 28) * 0.6, size - 28);
+                ctx.globalAlpha = 1;
+            },
+            parking: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(x + size/2, y + size/2, size/2 - 6, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.font = 'bold ' + (size * 0.6) + 'px Lato, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('P', x + size/2, y + size/2 + size * 0.2);
+                ctx.textAlign = 'left';
+            },
+            loading: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2.5;
+                // Loading door
+                ctx.strokeRect(x + 14, y + 10, size - 28, size - 20);
+                // Door lines
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y + 10);
+                ctx.lineTo(x + size/2, y + size - 10);
+                ctx.stroke();
+                // Arrow up
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y + 20);
+                ctx.lineTo(x + size/2 - 8, y + 30);
+                ctx.moveTo(x + size/2, y + 20);
+                ctx.lineTo(x + size/2 + 8, y + 30);
+                ctx.stroke();
+            },
+            ceiling: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y + 6);
+                ctx.lineTo(x + size/2, y + size - 6);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + size/2 - 8, y + 16);
+                ctx.lineTo(x + size/2, y + 6);
+                ctx.lineTo(x + size/2 + 8, y + 16);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + size/2 - 8, y + size - 16);
+                ctx.lineTo(x + size/2, y + size - 6);
+                ctx.lineTo(x + size/2 + 8, y + size - 16);
+                ctx.stroke();
+            },
+            power: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Lightning bolt
+                ctx.beginPath();
+                ctx.moveTo(x + size/2 + 8, y + 8);
+                ctx.lineTo(x + size/2 - 8, y + size/2 + 4);
+                ctx.lineTo(x + size/2, y + size/2 + 4);
+                ctx.lineTo(x + size/2 - 8, y + size - 8);
+                ctx.lineTo(x + size/2 + 8, y + size/2 - 4);
+                ctx.lineTo(x + size/2, y + size/2 - 4);
+                ctx.closePath();
+                ctx.stroke();
+            },
+            'floor-load': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Floor with weight
+                ctx.beginPath();
+                ctx.moveTo(x + 8, y + size - 16);
+                ctx.lineTo(x + size - 8, y + size - 16);
+                ctx.stroke();
+                // Down arrow
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y + 10);
+                ctx.lineTo(x + size/2, y + size - 22);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + size/2 - 8, y + size - 28);
+                ctx.lineTo(x + size/2, y + size - 20);
+                ctx.lineTo(x + size/2 + 8, y + size - 28);
+                ctx.stroke();
+            },
+            construction: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Blueprint/rolled paper
+                ctx.strokeRect(x + 8, y + 14, size - 16, size - 28);
+                // Grid lines
+                ctx.beginPath();
+                ctx.moveTo(x + 8 + (size - 16) / 3, y + 14);
+                ctx.lineTo(x + 8 + (size - 16) / 3, y + size - 14);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 8 + 2 * (size - 16) / 3, y + 14);
+                ctx.lineTo(x + 8 + 2 * (size - 16) / 3, y + size - 14);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 8, y + 14 + (size - 28) / 3);
+                ctx.lineTo(x + size - 8, y + 14 + (size - 28) / 3);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 8, y + 14 + 2 * (size - 28) / 3);
+                ctx.lineTo(x + size - 8, y + 14 + 2 * (size - 28) / 3);
+                ctx.stroke();
+                // Corner curl
+                ctx.beginPath();
+                ctx.moveTo(x + size - 8, y + 14);
+                ctx.lineTo(x + size - 16, y + 14);
+                ctx.lineTo(x + size - 8, y + 22);
+                ctx.fill();
+            },
+            traffic: (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                
+                // First car (left)
+                const car1X = x + 8;
+                const carWidth = (size - 24) / 2;
+                const carY = y + size/2 - 4;
+                
+                // Car body
+                ctx.strokeRect(car1X, carY, carWidth, 10);
+                // Car top
+                ctx.beginPath();
+                ctx.moveTo(car1X + 4, carY);
+                ctx.lineTo(car1X + 6, carY - 6);
+                ctx.lineTo(car1X + carWidth - 6, carY - 6);
+                ctx.lineTo(car1X + carWidth - 4, carY);
+                ctx.stroke();
+                // Wheels
+                ctx.beginPath();
+                ctx.arc(car1X + 5, carY + 12, 3, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(car1X + carWidth - 5, carY + 12, 3, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Second car (right)
+                const car2X = x + size - 8 - carWidth;
+                
+                // Car body
+                ctx.strokeRect(car2X, carY, carWidth, 10);
+                // Car top
+                ctx.beginPath();
+                ctx.moveTo(car2X + 4, carY);
+                ctx.lineTo(car2X + 6, carY - 6);
+                ctx.lineTo(car2X + carWidth - 6, carY - 6);
+                ctx.lineTo(car2X + carWidth - 4, carY);
+                ctx.stroke();
+                // Wheels
+                ctx.beginPath();
+                ctx.arc(car2X + 5, carY + 12, 3, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(car2X + carWidth - 5, carY + 12, 3, 0, Math.PI * 2);
+                ctx.stroke();
+            },
+            'basic-rent': (ctx, x, y, size) => {
+                ctx.fillStyle = WHITE;
+                ctx.font = 'bold ' + (size * 0.5) + 'px Lato, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('$', x + size/2, y + size/2 + size * 0.15);
+                ctx.textAlign = 'left';
+            },
+            'additional-rent': (ctx, x, y, size) => {
+                ctx.fillStyle = WHITE;
+                ctx.font = 'bold ' + (size * 0.4) + 'px Lato, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('+$', x + size/2, y + size/2 + size * 0.12);
+                ctx.textAlign = 'left';
+            },
+            'gross-rent': (ctx, x, y, size) => {
+                ctx.fillStyle = WHITE;
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                ctx.font = 'bold ' + (size * 0.4) + 'px Lato, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('$$', x + size/2, y + size/2 + size * 0.12);
+                ctx.textAlign = 'left';
+            },
+            'asking-price': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Price tag
+                ctx.beginPath();
+                ctx.moveTo(x + 16, y + 12);
+                ctx.lineTo(x + size - 12, y + 12);
+                ctx.lineTo(x + size - 12, y + size - 20);
+                ctx.lineTo(x + size/2, y + size - 8);
+                ctx.lineTo(x + 16, y + size - 20);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.font = 'bold ' + (size * 0.3) + 'px Lato, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('$', x + size/2, y + size/2);
+                ctx.textAlign = 'left';
+            },
+            'year-built': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Calendar
+                ctx.strokeRect(x + 10, y + 14, size - 20, size - 24);
+                ctx.beginPath();
+                ctx.moveTo(x + 10, y + 28);
+                ctx.lineTo(x + size - 10, y + 28);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + 22, y + 10);
+                ctx.lineTo(x + 22, y + 18);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + size - 22, y + 10);
+                ctx.lineTo(x + size - 22, y + 18);
+                ctx.stroke();
+            },
+            'date-available': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.fillStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Calendar with checkmark
+                ctx.strokeRect(x + 10, y + 14, size - 20, size - 24);
+                ctx.beginPath();
+                ctx.moveTo(x + 10, y + 28);
+                ctx.lineTo(x + size - 10, y + 28);
+                ctx.stroke();
+                // Checkmark
+                ctx.beginPath();
+                ctx.moveTo(x + 18, y + size/2 + 4);
+                ctx.lineTo(x + size/2 - 4, y + size - 18);
+                ctx.lineTo(x + size - 16, y + 34);
+                ctx.stroke();
+            },
+            'est-completion': (ctx, x, y, size) => {
+                ctx.strokeStyle = WHITE;
+                ctx.lineWidth = 2;
+                // Clock
+                ctx.beginPath();
+                ctx.arc(x + size/2, y + size/2, size/2 - 10, 0, Math.PI * 2);
+                ctx.stroke();
+                // Clock hands
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y + size/2);
+                ctx.lineTo(x + size/2, y + 18);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y + size/2);
+                ctx.lineTo(x + size/2 + 12, y + size/2 + 8);
+                ctx.stroke();
+            }
+        };
+
+        // Feature configurations
+        const featureConfigs = {
+            zoning: { toggle: 'toggle-zoning', input: 'input-zoning', label: 'ZONING:', getValue: () => document.getElementById('zoning-value').value },
+            ocp: { toggle: 'toggle-ocp', input: 'input-ocp', label: 'OCP DESIGNATION:', getValue: () => document.getElementById('ocp-value').value },
+            'lot-size': { toggle: 'toggle-lot-size', input: 'input-lot-size', label: 'LOT SIZE:', getValue: () => document.getElementById('lot-size-value').value },
+            'building-size': { toggle: 'toggle-building-size', input: 'input-building-size', label: 'BUILDING SIZE:', getValue: () => document.getElementById('building-size-value').value },
+            'unit-size': { toggle: 'toggle-unit-size', input: 'input-unit-size', label: 'UNIT SIZE:', getValue: () => document.getElementById('unit-size-value').value },
+            'site-coverage': { toggle: 'toggle-site-coverage', input: 'input-site-coverage', label: 'SITE COVERAGE:', getValue: () => document.getElementById('site-coverage-value').value },
+            parking: { toggle: 'toggle-parking', input: 'input-parking', label: 'PARKING:', getValue: () => document.getElementById('parking-value').value },
+            loading: { toggle: 'toggle-loading', input: 'input-loading', label: 'LOADING DOORS:', getValue: () => document.getElementById('loading-value').value },
+            ceiling: { toggle: 'toggle-ceiling', input: 'input-ceiling', label: 'CEILING HEIGHT:', getValue: () => document.getElementById('ceiling-value').value },
+            power: { toggle: 'toggle-power', input: 'input-power', label: 'POWER SUPPLY:', getValue: () => document.getElementById('power-value').value },
+            'floor-load': { toggle: 'toggle-floor-load', input: 'input-floor-load', label: 'FLOOR LOAD:', getValue: () => document.getElementById('floor-load-value').value },
+            construction: { toggle: 'toggle-construction', input: 'input-construction', label: 'CONSTRUCTION:', getValue: () => document.getElementById('construction-value').value },
+            traffic: { toggle: 'toggle-traffic', input: 'input-traffic', label: 'TRAFFIC COUNT:', getValue: () => document.getElementById('traffic-value').value },
+            'basic-rent': { toggle: 'toggle-basic-rent', input: 'input-basic-rent', label: 'BASIC RENT:', getValue: () => document.getElementById('basic-rent-value').value },
+            'additional-rent': { toggle: 'toggle-additional-rent', input: 'input-additional-rent', label: 'ADDITIONAL RENT:', getValue: () => document.getElementById('additional-rent-value').value },
+            'gross-rent': { toggle: 'toggle-gross-rent', input: 'input-gross-rent', label: 'GROSS RENT:', getValue: () => document.getElementById('gross-rent-value').value },
+            'asking-price': { toggle: 'toggle-asking-price', input: 'input-asking-price', label: 'ASKING PRICE:', getValue: () => document.getElementById('asking-price-value').value },
+            'year-built': { toggle: 'toggle-year-built', input: 'input-year-built', label: 'YEAR BUILT:', getValue: () => document.getElementById('year-built-value').value },
+            'date-available': { toggle: 'toggle-date-available', input: 'input-date-available', label: 'DATE AVAILABLE:', getValue: () => document.getElementById('date-available-value').value },
+            'est-completion': { toggle: 'toggle-est-completion', input: 'input-est-completion', label: 'EST. COMPLETION:', getValue: () => document.getElementById('est-completion-value').value }
+        };
+
+        // Get active features
+        function getActiveFeatures() {
+            const active = [];
+            for (const [key, config] of Object.entries(featureConfigs)) {
+                if (document.getElementById(config.toggle).checked) {
+                    active.push({
+                        key,
+                        label: config.label,
+                        value: config.getValue()
+                    });
+                }
+            }
+            return active;
+        }
+
+        // Draw the canvas
+        function render() {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear canvas
+            ctx.fillStyle = WHITE;
+            ctx.fillRect(0, 0, width, height);
+
+            // Header bar
+            const headerHeight = 120;
+            ctx.fillStyle = MAROON;
+            ctx.fillRect(0, 0, width, headerHeight);
+
+            // Headline text
+            const headline = document.getElementById('headline').value || 'Prime Commercial Opportunity';
+            ctx.fillStyle = WHITE;
+            ctx.font = 'bold 38px Playfair Display, serif';
+            ctx.textAlign = 'center';
+            
+            // Word wrap headline
+            const maxWidth = width - 80;
+            const words = headline.split(' ');
+            let lines = [];
+            let currentLine = '';
+            
+            for (const word of words) {
+                const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            lines.push(currentLine);
+
+            const lineHeight = 44;
+            const totalTextHeight = lines.length * lineHeight;
+            const startY = (headerHeight - totalTextHeight) / 2 + 32;
+
+            lines.forEach((line, i) => {
+                ctx.fillText(line, width / 2, startY + i * lineHeight);
+            });
+            ctx.textAlign = 'left';
+
+            // Photo area
+            const photoTop = headerHeight;
+            const photoHeight = 580;
+            
+            if (uploadedImage) {
+                // Calculate image dimensions with zoom
+                const zoom = imageZoom / 100;
+                const imgAspect = uploadedImage.width / uploadedImage.height;
+                const areaAspect = width / photoHeight;
+
+                let drawWidth, drawHeight;
+                if (imgAspect > areaAspect) {
+                    drawHeight = photoHeight * zoom;
+                    drawWidth = drawHeight * imgAspect;
+                } else {
+                    drawWidth = width * zoom;
+                    drawHeight = drawWidth / imgAspect;
+                }
+
+                // Calculate position based on sliders
+                const maxOffsetX = Math.max(0, drawWidth - width);
+                const maxOffsetY = Math.max(0, drawHeight - photoHeight);
+                const offsetX = -(imagePosition.x / 100) * maxOffsetX;
+                const offsetY = -(imagePosition.y / 100) * maxOffsetY;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(0, photoTop, width, photoHeight);
+                ctx.clip();
+                ctx.drawImage(uploadedImage, offsetX, photoTop + offsetY, drawWidth, drawHeight);
+                ctx.restore();
+            } else {
+                // Placeholder
+                ctx.fillStyle = '#e0e0e0';
+                ctx.fillRect(0, photoTop, width, photoHeight);
+                ctx.fillStyle = '#999';
+                ctx.font = '24px Lato, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Upload a property photo', width / 2, photoTop + photoHeight / 2);
+                ctx.textAlign = 'left';
+            }
+
+            // Address bar
+            const addressTop = photoTop + photoHeight;
+            const addressHeight = 70;
+            ctx.fillStyle = WHITE;
+            ctx.fillRect(0, addressTop, width, addressHeight);
+            
+            const address = document.getElementById('address').value || '[Insert Property Address Here]';
+            ctx.fillStyle = DARK_GREY;
+            ctx.font = '32px Playfair Display, serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(address, width / 2, addressTop + 46);
+            ctx.textAlign = 'left';
+
+            // Feature boxes
+            const features = getActiveFeatures();
+            const featuresTop = addressTop + addressHeight;
+            const featuresHeight = height - featuresTop - 10;
+            
+            if (features.length > 0) {
+                const boxPadding = 12;
+                const maxPerRow = 5;
+                
+                // Calculate rows and distribution
+                let rows;
+                if (features.length <= maxPerRow) {
+                    rows = [features];
+                } else {
+                    // Calculate how many rows we need
+                    const numRows = Math.ceil(features.length / maxPerRow);
+                    const itemsPerRow = Math.ceil(features.length / numRows);
+                    
+                    // Distribute features across rows
+                    rows = [];
+                    for (let i = 0; i < features.length; i += itemsPerRow) {
+                        rows.push(features.slice(i, i + itemsPerRow));
+                    }
+                }
+                
+                const numRows = rows.length;
+                const rowGap = 12;
+                const totalRowGaps = (numRows - 1) * rowGap;
+                const boxHeight = (featuresHeight - totalRowGaps - 20) / numRows;
+                
+                // Font sizes - adjust based on number of items per row
+                const maxItemsInAnyRow = Math.max(...rows.map(row => row.length));
+                const scaleFactor = Math.max(0.7, 1 - (maxItemsInAnyRow - 4) * 0.08);
+                const iconSize = Math.floor(50 * scaleFactor);
+                const labelSize = Math.floor(16 * scaleFactor);
+                const valueSize = Math.floor(24 * scaleFactor);
+
+                // Draw each row
+                rows.forEach((rowFeatures, rowIndex) => {
+                    const boxesInRow = rowFeatures.length;
+                    const totalPadding = boxPadding * (boxesInRow + 1);
+                    const boxWidth = (width - totalPadding) / boxesInRow;
+                    const rowY = featuresTop + 10 + rowIndex * (boxHeight + rowGap);
+
+                    rowFeatures.forEach((feature, colIndex) => {
+                        const boxX = boxPadding + colIndex * (boxWidth + boxPadding);
+
+                        // Box background
+                        ctx.fillStyle = MAROON;
+                        ctx.beginPath();
+                        ctx.roundRect(boxX, rowY, boxWidth, boxHeight, 8);
+                        ctx.fill();
+
+                        // Icon
+                        const iconX = boxX + (boxWidth - iconSize) / 2;
+                        const iconY = rowY + 15;
+                        if (featureIcons[feature.key]) {
+                            featureIcons[feature.key](ctx, iconX, iconY, iconSize);
+                        }
+
+                        // Label
+                        ctx.fillStyle = WHITE;
+                        ctx.textAlign = 'center';
+                        
+                        ctx.font = `bold ${labelSize}px Arial, sans-serif`;
+                        const labelY = rowY + iconSize + 35;
+                        
+                        // Word wrap label if needed
+                        const labelWords = feature.label.split(' ');
+                        let labelLine = '';
+                        let currentLabelY = labelY;
+                        labelWords.forEach(word => {
+                            const testLine = labelLine + (labelLine ? ' ' : '') + word;
+                            if (ctx.measureText(testLine).width > boxWidth - 16) {
+                                ctx.fillText(labelLine, boxX + boxWidth / 2, currentLabelY);
+                                labelLine = word;
+                                currentLabelY += labelSize + 4;
+                            } else {
+                                labelLine = testLine;
+                            }
+                        });
+                        ctx.fillText(labelLine, boxX + boxWidth / 2, currentLabelY);
+                        
+                        // Value
+                        ctx.font = `${valueSize}px Arial, sans-serif`;
+                        let valueY = currentLabelY + valueSize + 8;
+                        
+                        // Word wrap value if needed
+                        const valueWords = feature.value.split(' ');
+                        let valueLine = '';
+                        valueWords.forEach(word => {
+                            const testLine = valueLine + (valueLine ? ' ' : '') + word;
+                            if (ctx.measureText(testLine).width > boxWidth - 16) {
+                                ctx.fillText(valueLine, boxX + boxWidth / 2, valueY);
+                                valueLine = word;
+                                valueY += valueSize + 4;
+                            } else {
+                                valueLine = testLine;
+                            }
+                        });
+                        ctx.fillText(valueLine, boxX + boxWidth / 2, valueY);
+
+                        ctx.textAlign = 'left';
+                    });
+                });
+            }
+
+            // Decorative corner accent
+            ctx.fillStyle = LIGHT_TEAL;
+            ctx.beginPath();
+            ctx.moveTo(width, height);
+            ctx.lineTo(width - 50, height);
+            ctx.lineTo(width, height - 50);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Event listeners
+        document.getElementById('photo-upload').addEventListener('click', () => {
+            document.getElementById('photo-input').click();
+        });
+
+        document.getElementById('photo-upload').addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = '#6a0509';
+            e.currentTarget.style.background = '#f5efef';
+        });
+
+        document.getElementById('photo-upload').addEventListener('dragleave', (e) => {
+            e.currentTarget.style.borderColor = '#8F060B';
+            e.currentTarget.style.background = '#faf7f7';
+        });
+
+        document.getElementById('photo-upload').addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = '#8F060B';
+            e.currentTarget.style.background = '#faf7f7';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        });
+
+        document.getElementById('photo-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        });
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    const uploadDiv = document.getElementById('photo-upload');
+                    uploadDiv.innerHTML = `<img src="${e.target.result}" alt="Property photo">`;
+                    uploadDiv.classList.add('has-image');
+                    render();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Position and zoom controls
+        document.getElementById('pos-x').addEventListener('input', (e) => {
+            imagePosition.x = parseInt(e.target.value);
+            render();
+        });
+
+        document.getElementById('pos-y').addEventListener('input', (e) => {
+            imagePosition.y = parseInt(e.target.value);
+            render();
+        });
+
+        document.getElementById('zoom').addEventListener('input', (e) => {
+            imageZoom = parseInt(e.target.value);
+            render();
+        });
+
+        // Text inputs
+        ['headline', 'address', 'zoning-value', 'ocp-value', 'lot-size-value', 'building-size-value',
+         'unit-size-value', 'site-coverage-value', 'parking-value', 'loading-value', 'ceiling-value',
+         'power-value', 'floor-load-value', 'construction-value', 'traffic-value', 'basic-rent-value',
+         'additional-rent-value', 'gross-rent-value', 'asking-price-value', 'year-built-value',
+         'date-available-value', 'est-completion-value'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', render);
+        });
+
+        // Feature toggles
+        Object.entries(featureConfigs).forEach(([key, config]) => {
+            const toggle = document.getElementById(config.toggle);
+            const inputDiv = document.getElementById(config.input);
+            
+            toggle.addEventListener('change', () => {
+                if (toggle.checked) {
+                    inputDiv.classList.add('active');
+                } else {
+                    inputDiv.classList.remove('active');
+                }
+                render();
+            });
+        });
+
+        // Download button
+        document.getElementById('download-btn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            const address = document.getElementById('address').value || 'commercial-listing';
+            const filename = address.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.png';
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
