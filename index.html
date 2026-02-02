@@ -285,6 +285,14 @@
             <!-- Headline Section -->
             <div class="section">
                 <div class="section-title">Headline</div>
+                <label for="transaction-type">Transaction Type</label>
+                <select id="transaction-type">
+                    <option value="FOR LEASE">FOR LEASE</option>
+                    <option value="FOR SALE">FOR SALE</option>
+                    <option value="SOLD">SOLD</option>
+                    <option value="LEASED">LEASED</option>
+                    <option value="IMPROVED PRICING">IMPROVED PRICING</option>
+                </select>
                 <label for="headline">Main Headline</label>
                 <input type="text" id="headline" value="Prime Commercial Opportunity | Now Available for Lease" placeholder="Enter headline...">
             </div>
@@ -931,15 +939,20 @@
             ctx.fillRect(0, 0, width, height);
 
             // Header bar
-            const headerHeight = 120;
+            const headerHeight = 200;
             ctx.fillStyle = MAROON;
             ctx.fillRect(0, 0, width, headerHeight);
 
-            // Headline text
-            const headline = document.getElementById('headline').value || 'Prime Commercial Opportunity';
+            // Transaction type (top section)
+            const transactionType = document.getElementById('transaction-type').value;
             ctx.fillStyle = WHITE;
-            ctx.font = 'bold 38px Playfair Display, serif';
+            ctx.font = 'bold 32px Arial, sans-serif';
             ctx.textAlign = 'center';
+            ctx.fillText(transactionType, width / 2, 38);
+
+            // Headline text (middle section)
+            const headline = document.getElementById('headline').value || 'Prime Commercial Opportunity';
+            ctx.font = 'bold 38px Playfair Display, serif';
             
             // Word wrap headline
             const maxWidth = width - 80;
@@ -959,13 +972,19 @@
             }
             lines.push(currentLine);
 
-            const lineHeight = 44;
+            const lineHeight = 42;
             const totalTextHeight = lines.length * lineHeight;
-            const startY = (headerHeight - totalTextHeight) / 2 + 32;
+            const headlineStartY = 90;
 
             lines.forEach((line, i) => {
-                ctx.fillText(line, width / 2, startY + i * lineHeight);
+                ctx.fillText(line, width / 2, headlineStartY + i * lineHeight);
             });
+
+            // Address (bottom section)
+            const address = document.getElementById('address').value || '[Property Address]';
+            ctx.font = '26px Arial, sans-serif';
+            const addressY = headlineStartY + totalTextHeight + 20;
+            ctx.fillText(address, width / 2, addressY);
             ctx.textAlign = 'left';
 
             // Photo area
@@ -1010,22 +1029,9 @@
                 ctx.textAlign = 'left';
             }
 
-            // Address bar
-            const addressTop = photoTop + photoHeight;
-            const addressHeight = 70;
-            ctx.fillStyle = WHITE;
-            ctx.fillRect(0, addressTop, width, addressHeight);
-            
-            const address = document.getElementById('address').value || '[Insert Property Address Here]';
-            ctx.fillStyle = DARK_GREY;
-            ctx.font = '32px Playfair Display, serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(address, width / 2, addressTop + 46);
-            ctx.textAlign = 'left';
-
             // Feature boxes
             const features = getActiveFeatures();
-            const featuresTop = addressTop + addressHeight;
+            const featuresTop = photoTop + photoHeight;
             const featuresHeight = height - featuresTop - 10;
             
             if (features.length > 0) {
@@ -1130,14 +1136,6 @@
                 });
             }
 
-            // Decorative corner accent
-            ctx.fillStyle = LIGHT_TEAL;
-            ctx.beginPath();
-            ctx.moveTo(width, height);
-            ctx.lineTo(width - 50, height);
-            ctx.lineTo(width, height - 50);
-            ctx.closePath();
-            ctx.fill();
         }
 
         // Event listeners
@@ -1214,6 +1212,9 @@
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', render);
         });
+
+        // Transaction type dropdown
+        document.getElementById('transaction-type').addEventListener('change', render);
 
         // Feature toggles
         Object.entries(featureConfigs).forEach(([key, config]) => {
